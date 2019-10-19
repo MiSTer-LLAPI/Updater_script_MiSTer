@@ -36,5 +36,5 @@ fi
 curl $CURL_RETRY --insecure -L "https://github.com/MiSTer-LLAPI/blisSTer_flash/blob/master/release/latest.hex?raw=true" -o "$SCRIPT_PATH/latest.hex"
 read -rsn1 -p "Ready to update, hold one of the blisSTer reset buttons and then press any key to proceed. DO NOT LET GO OF THE RESET BUTTON UNTIL UPDATING HAS COMPLETED!!"
 $SCRIPT_PATH/blisSTer_flash -r $SCRIPT_PATH/latest.hex 16d0 0a5f
-rm "$SCRIPT_PATH/bliSTer_flash" "$SCRIPT_PATH/latest.hex"
+rm "$SCRIPT_PATH/blisSTer_flash" "$SCRIPT_PATH/latest.hex"
 read -rsn1 -p "Done! Press any key to exit the script"
