@@ -15,7 +15,6 @@
 
 # Copyright 2018-2019 Alessandro "Locutus73" Miele
 
-
 #=========   USER OPTIONS   =========
 
 #Base directory for all script’s tasks, "/media/fat" for SD root, "/media/usb0" for USB drive root.
@@ -28,6 +27,7 @@ CORE_CATEGORY_PATHS["cores"]="$BASE_PATH/_LLAPI"
 DELETE_OLD_FILES="true"
 DOWNLOAD_NEW_CORES="true"
 REMOVE_ARCADE_PREFIX="true"
+REPOSITORIES_FILTER=""
 
 #EXPERIMENTAL: specifies if the update process must be done with parallel processing; use it at your own risk!
 PARALLEL_UPDATE="false"
@@ -44,8 +44,6 @@ CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5"
 SCRIPTS_PATH="Scripts"
 OLD_SCRIPTS_PATH="#Scripts"
 WORK_PATH="/media/fat/$SCRIPTS_PATH/.mister_updater"
-#Uncomment this if you want the script to sync the system date and time with a NTP server
-#NTP_SERVER="0.pool.ntp.org"
 AUTOREBOOT="false"
 REBOOT_PAUSE=0
 TEMP_PATH="/tmp"
@@ -141,7 +139,7 @@ CORE_CATEGORIES_FILTER=""
 if [ "$REPOSITORIES_FILTER" != "" ]
 then
 	CORE_CATEGORIES_FILTER="^\($( echo "$REPOSITORIES_FILTER" | sed 's/[ 	]\{1,\}/\\)\\|\\(/g' )\)$"
-	REPOSITORIES_FILTER="\(Main_MiSTer\)\|\(Menu_MiSTer\)\|\(SD-Installer-Win64_MiSTer\)\|\($( echo "$REPOSITORIES_FILTER" | sed 's/[ 	]\{1,\}/\\)\\|\\([\/_-]/g' )\)"
+	REPOSITORIES_FILTER="\(Updater_script_MiSTer\)\|\(Main_MiSTer\)\|\(Menu_MiSTer\)\|\(SD-Installer-Win64_MiSTer\)\|\($( echo "$REPOSITORIES_FILTER" | sed 's/[ 	]\{1,\}/\\)\\|\\([\/_-]/g' )\)"
 fi
 
 GOOD_CORES=""
@@ -166,9 +164,6 @@ function checkCoreURL {
 	MAX_RELEASE_URL=""
 	GOOD_CORE_VERSION=""
 	for RELEASE_URL in $RELEASE_URLS; do
-
-		RELEASE_URL=$CORE_URL${RELEASE_URL#\"}
-	
 		if echo "$RELEASE_URL" | grep -q "SharpMZ"
 		then
 			RELEASE_URL=$(echo "$RELEASE_URL"  | grep '\.rbf$')
@@ -201,7 +196,7 @@ function checkCoreURL {
 			MAX_RELEASE_URL=$RELEASE_URL
 		fi
 	done
-	
+
 	FILE_NAME=$(echo "$MAX_RELEASE_URL" | sed 's/.*\///g')
 	if [ "$CORE_CATEGORY" == "arcade-cores" ] && [ $REMOVE_ARCADE_PREFIX == "true" ]
 	then
@@ -270,14 +265,14 @@ function checkCoreURL {
 			break
 		fi
 	done
-	
+
 	if [[ "$MAX_VERSION" > "$MAX_LOCAL_VERSION" ]]
 	then
 		if [ "$DOWNLOAD_NEW_CORES" != "false" ] || [ "$MAX_LOCAL_VERSION" != "" ] || [ "$BASE_FILE_NAME" == "MiSTer" ] || [ "$BASE_FILE_NAME" == "menu" ] || { echo "$CORE_URL" | grep -q "SD-Installer"; }
 		then
 			echo "Downloading $FILE_NAME"
-			[ "${SSH_CLIENT}" != "" ] && echo "URL: $MAX_RELEASE_URL"
-			if curl $CURL_RETRY $SSL_SECURITY_OPTION -L "$MAX_RELEASE_URL" -o "$CURRENT_DIR/$FILE_NAME"
+			[ "${SSH_CLIENT}" != "" ] && echo "URL: https://github.com/$MAX_RELEASE_URL?raw=true"
+			if curl $CURL_RETRY $SSL_SECURITY_OPTION -L https://github.com/"$MAX_RELEASE_URL?raw=true" -o "$CURRENT_DIR/$FILE_NAME"
 			then
 				if [ ${DELETE_OLD_FILES} == "true" ]
 				then
@@ -355,7 +350,7 @@ for CORE_URL in $CORE_URLS; do
 	then
 		if [ "$REPOSITORIES_FILTER" == "" ] || { echo "$CORE_URL" | grep -qi "$REPOSITORIES_FILTER";  } || { echo "$CORE_CATEGORY" | grep -qi "$CORE_CATEGORIES_FILTER";  }
 		then
-			if echo "$CORE_URL" | grep -qE "(SD-Installer)|(/Main_MiSTer$)|(/Menu_MiSTer$)"
+			if echo "$CORE_URL" | grep -qE "(Updater_script_MiSTer)|(SD-Installer)|(/Main_MiSTer$)|(/Menu_MiSTer$)"
 			then
 				checkCoreURL
 			else
