@@ -23,6 +23,7 @@ BASE_PATH="/media/fat"
 #Directory where LLAPI Cores are downloaded
 declare -A CORE_CATEGORY_PATHS
 CORE_CATEGORY_PATHS["cores"]="$BASE_PATH/_LLAPI"
+CORE_CATEGORY_PATHS["arcade-cores"]="$BASE_PATH/_LLAPI"
 
 DELETE_OLD_FILES="true"
 DOWNLOAD_NEW_CORES="true"
